@@ -1,0 +1,36 @@
+[tool.poetry]
+name = "reconcile-agent"
+version = "0.1.0"
+description = "Agentic invoice-to-bank reconciliation with human-in-the-loop"
+authors = ["Adish Ansari <adishansari786.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.112"
+uvicorn = {extras = ["standard"], version = "^0.30"}
+sqlalchemy = "^2.0"
+psycopg2-binary = "^2.9"
+langchain = "^0.2"
+langgraph = "^0.1"
+langchain-openai = "^0.1"
+python-dotenv = "^1.0"
+rapidfuzz = "^3.9"
+pytest = "^8.0"
+pytest-asyncio = "^0.23"
+httpx = "^0.27"
+faker = "^28.0"
+python-multipart = "^0.0.9"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.0"
+ruff = "^0.6"
+mypy = "^1.11"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["src/tests"]
