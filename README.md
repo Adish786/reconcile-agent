@@ -80,24 +80,41 @@ poetry install
 # Create .env file from example (copy and fill in your key)
 cp .env.example .env   # Add OPENAI_API_KEY and OPENAI_BASE_URL
 
+python -m poetry lock
+# If getting error then delete the Db 
+ Remove-Item .\test.db   
 # Start the server
-poetry run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
-
+#poetry run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+python -m poetry run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
 
 Test the API
-1. Upload invoices (CSV)
+# 1. Upload
 curl.exe -F "file=@invoices.csv" http://127.0.0.1:8000/upload/invoices
-2. Run baseline reconciliation (rule‑based)
-curl -X POST "http://127.0.0.1:8000/reconcile/1?use_advanced=false"
-3. Run advanced reconciliation (LLM)
-curl -X POST "http://127.0.0.1:8000/reconcile/1?use_advanced=true"
-4. Check the review queue
-curl http://127.0.0.1:8000/review/queue
-5. Approve/reject a pending match
-curl -X PUT "http://127.0.0.1:8000/review/1" \
-  -H "Content-Type: application/json" \
-  -d '{"decision": "APPROVED", "notes": "Looks good"}'
 
+# 2. Baseline (match)
+Invoke-RestMethod -Uri "http://127.0.0.1:8000/reconcile/1?use_advanced=false" -Method Post -ContentType "application/json"
+
+# 3. Baseline (no match) – use an invoice that has no transaction
+Invoke-RestMethod -Uri "http://127.0.0.1:8000/reconcile/999?use_advanced=false" -Method Post -ContentType "application/json"
+
+# 4. Advanced – requires valid Gemini key
+Invoke-RestMethod -Uri "http://127.0.0.1:8000/reconcile/1?use_advanced=true" -Method Post -ContentType "application/json"
+
+# 5. Review queue
+Invoke-RestMethod -Uri "http://127.0.0.1:8000/review/queue"
+
+# 6. Approve match
+$body = @{ decision = "APPROVED"; notes = "Looks good" } | ConvertTo-Json
+Invoke-RestMethod -Uri "http://127.0.0.1:8000/review/1" -Method Put -Body $body -ContentType "application/json"
+
+# 7. Reject match
+$body = @{ decision = "REJECTED"; notes = "Not a match" } | ConvertTo-Json
+Invoke-RestMethod -Uri "http://127.0.0.1:8000/review/1" -Method Put -Body $body -ContentType "application/json"
+
+# 8. Health
+Invoke-RestMethod -Uri "http://127.0.0.1:8000/health"
+# Test Case 
+python -m poetry run pytest -v
 📡 API Endpoints Summary
 Method	Endpoint	Description
 POST	/upload/invoices	Upload CSV of invoices
