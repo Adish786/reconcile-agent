@@ -129,16 +129,16 @@ Interactive API docs available at http://127.0.0.1:8000/docs.
 
 # How to USE scripts 
 # Basic seeding (20 invoices, 80% match, no drop)
-python scripts/seed.py
+python -m poetry run python scripts/seed.py
 
 # Seed 50 invoices, drop existing tables, skip confirmation
-python scripts/seed.py --count 50 --drop --no-confirm
+python -m poetry run python scripts/seed.py --count 50 --drop --no-confirm
 
 # Reproducible seeding (same data every time)
-python scripts/seed.py --seed 42
+python -m poetry run python scripts/seed.py --seed 42
 
 # Override match probability (e.g., 50% match)
-python scripts/seed.py --match-prob 0.5
+python -m poetry run python scripts/seed.py --match-prob 0.5
 
 #Frontend Dashboard
 Ensure the backend is running (see above).

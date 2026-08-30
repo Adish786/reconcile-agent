@@ -6,7 +6,7 @@ This script populates the database with synthetic invoices and transactions
 for testing, development, and demonstration purposes.
 
 Usage:
-    python scripts/seed.py [--count N] [--drop] [--no-confirm]
+    python -m poetry run python scripts/seed.py [--count N] [--drop] [--no-confirm]
 
 Options:
     --count N       Number of invoices to generate (default: 20)
@@ -15,15 +15,17 @@ Options:
     --seed SEED     Random seed for reproducible data (optional)
 
 Example:
-    python scripts/seed.py --count 50 --drop --seed 42
+    python -m poetry run python scripts/seed.py --count 50 --drop --seed 42
 """
 
 import argparse
 import logging
+from pathlib import Path
 import random
 import sys
 from datetime import datetime, timedelta
-
+project_root = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(project_root))
 from faker import Faker
 
 from src.database import SessionLocal, engine
