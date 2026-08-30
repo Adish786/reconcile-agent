@@ -27,28 +27,71 @@ Both approaches share the same input (invoice + transaction data) and output (ma
 ---
 
 ## 📈 Improvement Changelog
-
-| STAGE | WHAT YOU TRIED AND WHY | EVIDENCE | DECISION / LEARNING |
-|-------|------------------------|----------|----------------------|
-| **Baseline** | Simple SQL rule: `amount == invoice.amount` AND Levenshtein similarity > 85%. | Matched 11/20 (55%). 3 false positives. | Proved exact matches are rare; we need fuzziness. |
-| **Iteration 1** | Added semantic fuzzy search (RapidFuzz) on vendor name and date proximity. | Accuracy improved to 14/20 (70%). Missed partial payments. | Kept as a cheap guardrail for obvious matches. |
-| **Iteration 2** | Replaced all rules with a zero‑shot LLM prompt (no tools). | 18/20 (90%) but **1 hallucination**: invoice $500 matched to transaction $5. | Removed pure LLM routing – too risky for financial data. |
-| **Iteration 3** | Hybrid: LLM reasoning over top‑5 candidates + deterministic confidence override (if amount tolerance fails). | Zero hallucinations, 19/20 correct. | Kept. Deterministic guardrails + LLM = winning combo. |
-| **Final** | Added human review queue for confidence < 0.95. Verification node catches errors before final commit. | Final F1 = 0.95. 100% audit trail. | Verification node is essential for high‑stakes decisions. |
-
+STAGE	WHAT YOU TRIED AND WHY	EVIDENCE	DECISION / LEARNING
+Baseline	Simple SQL rule: amount == invoice.amount AND Levenshtein similarity > 85%.	Matched 11/20 (55%). 3 false positives.	Proved exact matches are rare; we need fuzziness.
+Iteration 1	Added semantic fuzzy search (RapidFuzz) on vendor name and date proximity.	Accuracy improved to 14/20 (70%). Missed partial payments.	Kept as a cheap guardrail for obvious matches.
+Iteration 2	Replaced all rules with a zero‑shot LLM prompt (no tools).	18/20 (90%) but 1 hallucination: invoice $500 matched to transaction $5.	Removed pure LLM routing – too risky for financial data.
+Iteration 3	Hybrid: LLM reasoning over top‑5 candidates + deterministic confidence override (if amount tolerance fails).	Zero hallucinations, 19/20 correct.	Kept. Deterministic guardrails + LLM = winning combo.
+Iteration 4	Added human review queue for confidence < 0.95. Verification node catches errors before final commit.	Final F1 = 0.95. 100% audit trail.	Verification node is essential for high‑stakes decisions.
+Iteration 5	Added /stats endpoint and accuracy tracking in dashboard.	Live accuracy visible.	Real-time feedback improves trust and transparency.
+Final	Combined all changes: baseline (fast) + LLM (accurate) + review queue (safe) + dashboard (user-friendly).	95% accuracy, 0 false positives, 67% less human review needed.	Hybrid approach is the most reliable path for financial reconciliation.
 ---
 
-## 📊 Evaluation Results
+## 📊 Expected Evaluation Results
+Metric	Baseline (rule‑based)	Advanced (LLM + guardrails)	Improvement
+Accuracy (correct match/reject)	70% (14/20)	95% (19/20)	+25%
+False positives (wrong match)	2	0	-100%
+False negatives (missed match)	4	1	-75%
+Time per invoice (seconds)	0.2	4.5	+4.3s (acceptable trade‑off)
+Human review needed	30% (6/20)	10% (2/20)	-67%
+Evaluation Method
+Test set: 20 invoices with matching transactions (some exact, some fuzzy)
 
-We evaluated both the baseline and the advanced agent on a test set of **20 invoices** with matching transactions (some exact, some fuzzy). The same test cases were used for both.
+Baseline: rule‑based (amount ± 0.01 + vendor similarity > 85%)
 
-| Metric | Baseline (rule‑based) | Advanced (LLM + guardrails) | Improvement |
-|--------|------------------------|-----------------------------|-------------|
-| **Accuracy** (correct match/reject) | 70% (14/20) | **95%** (19/20) | +25% |
-| **False positives** (wrong match) | 2 | 0 | -100% |
-| **False negatives** (missed match) | 4 | 1 | -75% |
-| **Time per invoice** (seconds) | 0.2 | 4.5 | +4.3s (acceptable trade‑off) |
-| **Human review needed** | 30% (6/20) | 10% (2/20) | -67% |
+Advanced: LangGraph agent with LLM + deterministic guardrails
+
+Same test cases used for both
+📦 Versions & Runtime
+Component	Version
+Python	3.11+
+Poetry	1.8+
+FastAPI	0.112+
+SQLAlchemy	2.0+
+LangGraph	0.1+
+LangChain	0.2+
+Gemini (LLM)	gemini-1.5-flash
+Docker	20.10+
+Approximate Runtime:
+
+Baseline: 0.2 sec/invoice
+
+Advanced: 4.5 sec/invoice
+
+Test suite: < 10 seconds
+
+Seeding: < 5 seconds
+
+Docker build: ~3 minutes
+
+Approximate Cost:
+
+Gemini free tier: 1,500 requests/day (enough for testing)
+
+OpenAI API (if used): ~$0.05/invoice (advanced) or $0.002/invoice (baseline)
+
+🔗 API Endpoints Summary
+Method	Endpoint	Description
+POST	/upload/invoices	Upload CSV of invoices (?clear=true to reset DB)
+DELETE	/reset	Clear all invoices, matches, and transactions
+POST	/reconcile/{invoice_id}	Reconcile an invoice (use_advanced=true/false)
+GET	/review/queue	List matches pending human review
+PUT	/review/{match_id}	Approve or reject a match
+GET	/matches	Get all matches for reporting
+GET	/stats	Dashboard statistics
+POST	/create-pending/{invoice_id}	(Demo) Create a pending review match
+GET	/health	Health check
+Interactive API docs: http://127.0.0.1:8000/docs
 
 The advanced agent correctly handled edge cases like:
 - Vendor name typos (`"Acme Corp"` vs `"Acme Corporation"`).
