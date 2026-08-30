@@ -71,7 +71,7 @@ The advanced agent correctly handled edge cases like:
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/reconcile-agent.git
+git clone https://github.com/Adish786/reconcile-agent.git
 cd reconcile-agent
 
 # Install dependencies

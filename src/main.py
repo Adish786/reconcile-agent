@@ -2,9 +2,11 @@
 FastAPI application for invoice-to-bank reconciliation using agentic workflows.
 
 This module provides REST endpoints for:
-- Uploading invoice CSV files.
+- Uploading invoice CSV files (with optional database reset).
 - Performing reconciliation (baseline rule-based or advanced LLM-based).
 - Managing a human review queue for ambiguous matches.
+- Resetting the database programmatically.
+- Fetching all matches for reporting.
 """
 
 import csv
@@ -13,7 +15,8 @@ import logging
 from datetime import datetime
 from typing import List, Optional
 
-from fastapi import Depends, FastAPI, HTTPException, UploadFile, File
+from fastapi import Depends, FastAPI, HTTPException, UploadFile, File, Query
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from src.config import settings
@@ -36,6 +39,15 @@ app = FastAPI(
     title="Reconcile Agent",
     description="Agentic invoice-to-bank reconciliation with human-in-the-loop",
     version="0.1.0",
+)
+
+# Add CORS middleware right after app creation
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # ----------------------------------------------------------------------
@@ -123,9 +135,38 @@ def _parse_invoice_csv(content: bytes) -> List[dict]:
 # ----------------------------------------------------------------------
 # Endpoints
 # ----------------------------------------------------------------------
+@app.delete("/reset", summary="Reset database (delete all invoices, matches, and transactions)")
+def reset_db(db: Session = Depends(get_db)):
+    """
+    Delete all data from the main tables, resetting the state.
+    This is useful before uploading a new set of invoices to avoid duplicate key errors.
+
+    Returns:
+        dict: Confirmation message.
+    """
+    try:
+        db.query(Match).delete()
+        db.query(Invoice).delete()
+        db.query(Transaction).delete()
+        db.commit()
+        logger.info("Database reset successfully.")
+        return {"message": "Database reset successfully. All invoices, matches, and transactions have been removed."}
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Reset failed: {e}")
+        raise HTTPException(500, f"Reset failed: {str(e)}")
+
+
 @app.post("/upload/invoices", summary="Upload invoices from CSV")
 async def upload_invoices(
-    file: UploadFile = File(..., description="CSV file with columns: vendor, invoice_number, amount, currency, due_date"),
+    file: UploadFile = File(
+        ...,
+        description="CSV file with columns: vendor, invoice_number, amount, currency, due_date"
+    ),
+    clear: bool = Query(
+        False,
+        description="If true, delete all existing invoices, matches, and transactions before uploading."
+    ),
     db: Session = Depends(get_db),
 ):
     """
@@ -138,9 +179,24 @@ async def upload_invoices(
         - currency (str, defaults to USD)
         - due_date (YYYY-MM-DD)
 
+    If `clear=True`, the endpoint will delete all existing data before inserting the new invoices,
+    preventing uniqueness conflicts.
+
     Returns:
         dict: {"message": f"Uploaded {count} invoices"}
     """
+    # Optional: clear database before upload
+    if clear:
+        try:
+            db.query(Match).delete()
+            db.query(Invoice).delete()
+            db.query(Transaction).delete()
+            db.commit()
+            logger.info("Database cleared before upload.")
+        except Exception as e:
+            db.rollback()
+            raise HTTPException(500, f"Failed to clear database: {str(e)}")
+
     # Validate file type
     if not file.filename or not file.filename.endswith(".csv"):
         raise HTTPException(400, "Only CSV files are allowed.")
@@ -286,7 +342,6 @@ def update_review(
         invoice = db.query(Invoice).filter(Invoice.id == match.invoice_id).first()
         if invoice:
             invoice.status = InvoiceStatus.PAID
-           # invoice.status = "PAID"
             logger.info(f"Invoice {invoice.id} marked as PAID.")
 
     db.commit()
@@ -306,3 +361,87 @@ def health_check():
         dict: {"status": "ok"}
     """
     return {"status": "ok"}
+
+
+# ----------------------------------------------------------------------
+# Matches endpoint (for reporting)
+# ----------------------------------------------------------------------
+@app.get("/matches", summary="Get all matches")
+def get_all_matches(
+    status: Optional[str] = None,  # 'pending', 'approved', 'rejected', 'all'
+    db: Session = Depends(get_db),
+):
+    """
+    Retrieve all matches, optionally filtered by human decision status.
+
+    Args:
+        status: Optional filter ('pending', 'approved', 'rejected').
+                If not provided, returns all matches.
+
+    Returns:
+        dict: {"total": count, "items": list of MatchOut objects}
+    """
+    query = db.query(Match)
+    if status == "pending":
+        query = query.filter(Match.human_decision.is_(None))
+    elif status == "approved":
+        query = query.filter(Match.human_decision == "APPROVED")
+    elif status == "rejected":
+        query = query.filter(Match.human_decision == "REJECTED")
+    # else: return all matches
+
+    matches = query.all()
+    return {
+        "total": len(matches),
+        "items": [MatchOut.model_validate(m) for m in matches],
+    }
+
+
+@app.get("/stats", summary="Dashboard statistics")
+def get_stats(db: Session = Depends(get_db)):
+    total_invoices = db.query(Invoice).count()
+    total_matches = db.query(Match).count()
+    pending = db.query(Match).filter(
+        Match.agent_decision == "NEEDS_REVIEW",
+        Match.human_decision.is_(None)
+    ).count()
+    
+    reviewed = db.query(Match).filter(Match.human_decision.isnot(None)).all()
+    total_reviewed = len(reviewed)
+    accuracy = None
+    if total_reviewed > 0:
+        correct = 0
+        for m in reviewed:
+            if m.human_decision == "APPROVED" and m.agent_decision in ["AUTO_MATCH", "NEEDS_REVIEW"]:
+                correct += 1
+            elif m.human_decision == "REJECTED" and m.agent_decision == "NO_MATCH":
+                correct += 1
+        accuracy = correct / total_reviewed
+    
+    return {
+        "total_invoices": total_invoices,
+        "total_matches": total_matches,
+        "pending": pending,
+        "accuracy": accuracy,
+        "total_reviewed": total_reviewed,
+    }
+
+
+
+@app.post("/create-pending/{invoice_id}")
+def create_pending_match(invoice_id: int, db: Session = Depends(get_db)):
+    invoice = db.query(Invoice).filter(Invoice.id == invoice_id).first()
+    if not invoice:
+        raise HTTPException(404, "Invoice not found")
+    match = Match(
+        invoice_id=invoice_id,
+        transaction_id=None,
+        confidence_score=0.45,
+        agent_decision="NEEDS_REVIEW",
+        agent_notes="Created via frontend for demo",
+        created_at=datetime.utcnow()
+    )
+    db.add(match)
+    db.commit()
+    db.refresh(match)
+    return {"message": f"Pending match created for invoice {invoice_id}", "match_id": match.id}
