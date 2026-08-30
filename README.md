@@ -127,9 +127,20 @@ PUT	/review/{match_id}	Approve or reject a match
 GET	/health	Health check (returns {"status":"ok"})
 Interactive API docs available at http://127.0.0.1:8000/docs.
 
+# How to USE scripts 
+# Basic seeding (20 invoices, 80% match, no drop)
+python scripts/seed.py
 
-Frontend Dashboard
+# Seed 50 invoices, drop existing tables, skip confirmation
+python scripts/seed.py --count 50 --drop --no-confirm
 
+# Reproducible seeding (same data every time)
+python scripts/seed.py --seed 42
+
+# Override match probability (e.g., 50% match)
+python scripts/seed.py --match-prob 0.5
+
+#Frontend Dashboard
 Ensure the backend is running (see above).
 Serve the dashboard from the project root:
 # From the project root
