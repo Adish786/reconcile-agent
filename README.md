@@ -1,3 +1,30 @@
+# 🧾 Reconcile Agent
+
+**Agentic invoice-to-bank reconciliation with human-in-the-loop for ambiguous matches.**
+
+---
+
+## 📌 Who Has This Problem?
+
+**Finance and accounting teams** at small-to-medium businesses that process **100+ invoices per week**.
+
+Manual reconciliation takes **5–10 minutes per invoice**. With 100 invoices/week, that’s **8–16 hours of manual work** every week. Errors are common—mis‑matched amounts, wrong vendors, missed payments—leading to payment delays, frustrated vendors, and reconciliation issues at month‑end.
+
+**Why solve it?**  
+Automating this saves **8+ hours/week** per finance team member, reduces human error, and speeds up the month‑end closing process. For a typical SME, that’s ~**$10k/year** in labour savings and fewer accounting headaches.
+
+---
+
+## 🧠 Solution Overview
+
+| Approach | Description |
+|----------|-------------|
+| **Baseline** | Rule‑based matching: exact amount ± 0.01 + vendor similarity > 85% (Levenshtein). |
+| **Advanced** | LangGraph agent with **retrieval**, **LLM reasoning** (via Gemini), **deterministic guardrails**, and a **review queue** for ambiguous cases. |
+
+Both approaches share the same input (invoice + transaction data) and output (match decision + confidence). The advanced agent uses an LLM to reason about fuzzy matches (typos, abbreviations, partial payments) while the baseline quickly handles clear‑cut cases.
+
+---
 ## 📈 Improvement Changelog
 
 | STAGE | WHAT YOU TRIED AND WHY | EVIDENCE | DECISION / LEARNING |
