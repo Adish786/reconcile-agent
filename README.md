@@ -67,7 +67,7 @@ The advanced agent correctly handled edge cases like:
 - A [Gemini API key](https://aistudio.google.com/) (free tier works for testing)
 - Git
 
-### Setup
+### Backend Setup
 
 ```bash
 # Clone the repository
@@ -80,11 +80,14 @@ poetry install
 # Create .env file from example (copy and fill in your key)
 cp .env.example .env   # Add OPENAI_API_KEY and OPENAI_BASE_URL
 
+# Lock dependencies
 python -m poetry lock
-# If getting error then delete the Db 
- Remove-Item .\test.db   
-# Start the server
-#poetry run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+
+# (Optional) If you get database errors, delete the existing DB
+# Remove-Item .\test.db   # Windows
+# rm test.db            # Linux/macOS
+
+# Start the backend server (port 8000)
 python -m poetry run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
 
 Test the API
@@ -123,6 +126,28 @@ GET	/review/queue	List matches pending human review
 PUT	/review/{match_id}	Approve or reject a match
 GET	/health	Health check (returns {"status":"ok"})
 Interactive API docs available at http://127.0.0.1:8000/docs.
+
+
+Frontend Dashboard
+
+Ensure the backend is running (see above).
+Serve the dashboard from the project root:
+# From the project root
+python -m http.server --directory dashboard 8502
+
+
+📡 API Endpoints Summary
+Method	Endpoint	Description
+POST	/upload/invoices	Upload CSV of invoices (use ?clear=true to reset DB)
+DELETE	/reset	Clear all invoices, matches, and transactions
+POST	/reconcile/{invoice_id}	Reconcile an invoice (use_advanced=true/false)
+GET	/review/queue	List matches pending human review
+PUT	/review/{match_id}	Approve or reject a match
+GET	/matches	Get all matches (for reporting)
+GET	/stats	Dashboard statistics (invoices, matches, pending, accuracy)
+POST	/create-pending/{invoice_id}	(Demo) Create a pending review match
+GET	/health	Health check
+Interactive API docs: http://127.0.0.1:8000/docs
 
 Agent Trajectories (Example)
 Below is a representative trajectory of the advanced agent evaluating invoice #1.
