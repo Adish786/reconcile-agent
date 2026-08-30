@@ -140,6 +140,14 @@ python -m poetry run python scripts/seed.py --seed 42
 # Override match probability (e.g., 50% match)
 python -m poetry run python scripts/seed.py --match-prob 0.5
 
+# Clean database, seed 20 invoices, and create a pending match for invoice 1
+python -m poetry run python scripts/seed.py --drop --no-confirm --pending
+
+# Seed 50 invoices and create a pending match for invoice 5
+python -m poetry run python scripts/seed.py --count 50 --pending --pending-invoice 5
+
+# Add 10 invoices to existing data and create a pending match for the first invoice
+python -m poetry run python scripts/seed.py --count 10 --pending
 #Frontend Dashboard
 Ensure the backend is running (see above).
 Serve the dashboard from the project root:
