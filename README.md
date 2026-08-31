@@ -74,6 +74,22 @@ In one case, the agent matched an invoice from “Acme Corp” ($500, due 2026-0
 **Lesson:** Never trust a single signal – LLMs are excellent at reasoning but can be fooled by surface‑level similarity. Combining **LLM reasoning + deterministic rules** is the most reliable path for high‑stakes financial tasks.
 
 ---
+### Upload Bank Transactions
+
+Upload a CSV file containing bank transactions. The expected columns are:
+
+- `vendor` (str) – Vendor name
+- `amount` (float) – Transaction amount
+- `date` (YYYY-MM-DD) – Transaction date
+- `currency` (str, optional, default USD)
+- `description` (str, optional) – Transaction description
+
+#### Example CSV (`bank.csv`)
+
+```csv
+vendor,amount,date,currency,description
+Acme Corp,1500.50,2026-01-14,USD,Payment from Acme Corp
+Beta Inc,2300.00,2026-01-15,USD,Payment from Beta Inc
 
 📦 Versions & Runtime
 Component	Version
@@ -181,19 +197,25 @@ Invoke-RestMethod -Uri "http://127.0.0.1:8000/review/1" -Method Put -Body $body 
 # 7. Reject match
 $body = @{ decision = "REJECTED"; notes = "Not a match" } | ConvertTo-Json
 Invoke-RestMethod -Uri "http://127.0.0.1:8000/review/1" -Method Put -Body $body -ContentType "application/json"
-
+curl -F "file=@bank.csv" "http://127.0.0.1:8000/upload/transactions?clear=true"
 # 8. Health
 Invoke-RestMethod -Uri "http://127.0.0.1:8000/health"
 # Test Case 
 python -m poetry run pytest -v
+
 📡 API Endpoints Summary
-Method	Endpoint	Description
-POST	/upload/invoices	Upload CSV of invoices
-POST	/reconcile/{invoice_id}	Reconcile an invoice (query param use_advanced to toggle)
-GET	/review/queue	List matches pending human review
-PUT	/review/{match_id}	Approve or reject a match
-GET	/health	Health check (returns {"status":"ok"})
-Interactive API docs available at http://127.0.0.1:8000/docs.
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/upload/invoices` | Upload CSV of invoices (?clear=true to reset DB) |
+| `POST` | `/upload/transactions` | Upload CSV of bank transactions (?clear=true to reset DB) |
+| `DELETE` | `/reset` | Clear all invoices, matches, and transactions |
+| `POST` | `/reconcile/{invoice_id}` | Reconcile an invoice (use_advanced=true/false) |
+| `GET` | `/review/queue` | List matches pending human review |
+| `PUT` | `/review/{match_id}` | Approve or reject a match |
+| `GET` | `/matches` | Get all matches for reporting |
+| `GET` | `/stats` | Dashboard statistics |
+| `POST` | `/create-pending/{invoice_id}` | (Demo) Create a pending review match |
+| `GET` | `/health` | Health check |
 
 # How to USE scripts 
 # Basic seeding (20 invoices, 80% match, no drop)
