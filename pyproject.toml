@@ -17,6 +17,7 @@ langchain-openai = "^0.1"
 python-dotenv = "^1.0"
 rapidfuzz = "^3.9"
 python-multipart = ">=0.0.10"
+pydantic-settings = "^2.15.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0"

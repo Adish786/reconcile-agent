@@ -8,558 +8,843 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <style>
+        /* ── base ── */
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #e9edf5 100%);
+            background: linear-gradient(145deg, #f0f3ff 0%, #e6ecf7 100%);
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
             min-height: 100vh;
         }
+
+        /* ── glass cards with colored accents ── */
         .glass-card {
-            background: rgba(255, 255, 255, 0.75);
+            background: rgba(255, 255, 255, 0.78);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.5);
             border-radius: 24px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.06);
-            transition: transform 0.2s;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         .glass-card:hover {
             transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.10);
         }
-        .gradient-text {
-            background: linear-gradient(135deg, #6C63FF, #3F3D9E);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+
+        /* ── colorful stat cards ── */
+        .stat-card {
+            border-left: 6px solid;
+            transition: all 0.2s;
         }
+        .stat-card-purple {
+            border-left-color: #6C63FF;
+            background: rgba(108, 99, 255, 0.08);
+        }
+        .stat-card-green {
+            border-left-color: #10b981;
+            background: rgba(16, 185, 129, 0.08);
+        }
+        .stat-card-orange {
+            border-left-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.08);
+        }
+        .stat-card-pink {
+            border-left-color: #ec4899;
+            background: rgba(236, 72, 153, 0.08);
+        }
+
         .stat-number {
             font-size: 2.2rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #6C63FF, #3F3D9E);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
+        .stat-number-purple {
+            color: #6C63FF;
+        }
+        .stat-number-green {
+            color: #10b981;
+        }
+        .stat-number-orange {
+            color: #f59e0b;
+        }
+        .stat-number-pink {
+            color: #ec4899;
+        }
+
         .stat-label {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.06em;
             color: #6b7280;
+            font-weight: 600;
         }
+
+        /* ── gradient buttons ── */
         .btn-gradient {
             background: linear-gradient(135deg, #6C63FF, #3F3D9E);
             border: none;
-            color: white;
+            color: #fff;
             transition: all 0.3s;
         }
         .btn-gradient:hover {
             transform: scale(1.02);
-            box-shadow: 0 4px 16px rgba(108,99,255,0.4);
-            color: white;
+            box-shadow: 0 4px 18px rgba(108, 99, 255, 0.45);
+            color: #fff;
         }
+
+        .btn-gradient-green {
+            background: linear-gradient(135deg, #10b981, #047857);
+            border: none;
+            color: #fff;
+            transition: all 0.3s;
+        }
+        .btn-gradient-green:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 18px rgba(16, 185, 129, 0.45);
+            color: #fff;
+        }
+
+        .btn-gradient-orange {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border: none;
+            color: #fff;
+            transition: all 0.3s;
+        }
+        .btn-gradient-orange:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 18px rgba(245, 158, 11, 0.45);
+            color: #fff;
+        }
+
+        .btn-gradient-pink {
+            background: linear-gradient(135deg, #ec4899, #be185d);
+            border: none;
+            color: #fff;
+            transition: all 0.3s;
+        }
+        .btn-gradient-pink:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 18px rgba(236, 72, 153, 0.45);
+            color: #fff;
+        }
+
         .btn-outline-gradient {
             background: transparent;
             border: 2px solid #6C63FF;
             color: #6C63FF;
+            transition: all 0.3s;
         }
         .btn-outline-gradient:hover {
             background: #6C63FF;
-            color: white;
+            color: #fff;
         }
+
+        /* ── upload area ── */
         .upload-area {
             border: 2px dashed #c4b5fd;
             border-radius: 20px;
             padding: 2.5rem;
             text-align: center;
-            background: rgba(108,99,255,0.03);
+            background: rgba(108, 99, 255, 0.03);
             transition: all 0.3s;
             cursor: pointer;
         }
         .upload-area:hover {
             border-color: #6C63FF;
-            background: rgba(108,99,255,0.06);
+            background: rgba(108, 99, 255, 0.07);
         }
         .upload-area.dragover {
             border-color: #6C63FF;
-            background: rgba(108,99,255,0.12);
+            background: rgba(108, 99, 255, 0.14);
         }
+
+        /* ── shimmer progress ── */
         .progress-bar-gradient {
             background: linear-gradient(90deg, #6C63FF, #a78bfa, #6C63FF);
             background-size: 200% 100%;
             animation: shimmer 2s infinite;
         }
         @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
         }
+
+        /* ── activity log ── */
         .activity-log {
             max-height: 200px;
             overflow-y: auto;
             font-size: 0.9rem;
         }
         .activity-log .list-group-item {
-            border-left: 3px solid #6C63FF;
+            border-left: 4px solid;
             margin-bottom: 4px;
             border-radius: 8px;
             background: transparent;
+            padding: 0.6rem 1rem;
         }
+        .activity-log .list-group-item.success {
+            border-left-color: #10b981;
+        }
+        .activity-log .list-group-item.error {
+            border-left-color: #ef4444;
+        }
+        .activity-log .list-group-item.info {
+            border-left-color: #6C63FF;
+        }
+
+        .activity-log::-webkit-scrollbar {
+            width: 4px;
+        }
+        .activity-log::-webkit-scrollbar-thumb {
+            background: #c4b5fd;
+            border-radius: 4px;
+        }
+
+        /* ── tabs ── */
         .nav-tabs .nav-link {
             color: #4b5563;
             font-weight: 500;
             border: none;
             padding: 0.75rem 1.25rem;
             border-radius: 12px 12px 0 0;
+            transition: all 0.2s;
         }
         .nav-tabs .nav-link.active {
-            background: white;
+            background: #fff;
             color: #6C63FF;
-            box-shadow: 0 -2px 12px rgba(108,99,255,0.1);
+            box-shadow: 0 -2px 16px rgba(108, 99, 255, 0.12);
             border-bottom: 3px solid #6C63FF;
         }
         .nav-tabs .nav-link:hover {
             color: #6C63FF;
+            background: rgba(108, 99, 255, 0.04);
         }
+
+        /* ── queue item badges ── */
+        .badge-decision-approved {
+            background: #10b981;
+            color: #fff;
+        }
+        .badge-decision-rejected {
+            background: #ef4444;
+            color: #fff;
+        }
+        .badge-decision-pending {
+            background: #f59e0b;
+            color: #fff;
+        }
+
+        /* ── misc ── */
+        .gradient-text {
+            background: linear-gradient(135deg, #6C63FF, #3F3D9E);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
         #healthStatus {
             font-size: 0.8rem;
             padding: 0.4rem 0.9rem;
             border-radius: 50px;
         }
-        .activity-log::-webkit-scrollbar { width: 4px; }
-        .activity-log::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 4px; }
+
+        /* responsive tweaks */
+        @media (max-width: 576px) {
+            .stat-number {
+                font-size: 1.6rem;
+            }
+        }
     </style>
 </head>
 <body>
 
-<div class="container py-4">
-    <!-- Header -->
-    <header class="d-flex flex-wrap align-items-center justify-content-between mb-4">
-        <div>
-            <h1 class="display-5 fw-bold"><i class="bi bi-receipt-cutoff text-primary"></i> <span class="gradient-text">Reconcile Agent</span></h1>
-            <p class="text-muted">Agentic invoice‑to‑bank reconciliation with human‑in‑the‑loop</p>
-        </div>
-        <div class="d-flex align-items-center gap-2">
-            <span id="healthStatus" class="badge bg-success">✅ Online</span>
-            <button id="resetBtn" class="btn btn-danger btn-sm"><i class="bi bi-trash3"></i> Reset</button>
-            <button id="refreshAllBtn" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-clockwise"></i></button>
-        </div>
-    </header>
+    <div class="container py-4">
 
-    <!-- Stats Row -->
-    <div class="row g-3 mb-4" id="statsRow">
-        <div class="col-md-3 col-6">
-            <div class="glass-card p-3 text-center">
-                <div class="stat-number" id="statInvoices">0</div>
-                <div class="stat-label">Total Invoices</div>
+        <!-- ═══ HEADER ═══ -->
+        <header class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+            <div>
+                <h1 class="display-5 fw-bold">
+                    <i class="bi bi-receipt-cutoff text-primary"></i>
+                    <span class="gradient-text">Reconcile Agent</span>
+                </h1>
+                <p class="text-muted">Agentic invoice‑to‑bank reconciliation with human‑in‑the‑loop</p>
             </div>
-        </div>
-        <div class="col-md-3 col-6">
-            <div class="glass-card p-3 text-center">
-                <div class="stat-number" id="statMatches">0</div>
-                <div class="stat-label">Total Matches</div>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <span id="healthStatus" class="badge bg-success">✅ Online</span>
+                <button id="resetBtn" class="btn btn-danger btn-sm"><i class="bi bi-trash3"></i> Reset</button>
+                <button id="refreshAllBtn" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-clockwise"></i></button>
             </div>
-        </div>
-        <div class="col-md-3 col-6">
-            <div class="glass-card p-3 text-center">
-                <div class="stat-number" id="statPending">0</div>
-                <div class="stat-label">Pending Reviews</div>
-            </div>
-        </div>
-        <div class="col-md-3 col-6">
-            <div class="glass-card p-3 text-center">
-                <div class="stat-number" id="statAccuracy">0%</div>
-                <div class="stat-label">Accuracy (est.)</div>
-            </div>
-        </div>
-    </div>
+        </header>
 
-    <!-- Tabs -->
-    <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
-        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#upload"><i class="bi bi-cloud-upload me-1"></i>Upload</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#reconcile"><i class="bi bi-arrow-left-right me-1"></i>Reconcile</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#queue"><i class="bi bi-list-check me-1"></i>Queue</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#report"><i class="bi bi-file-earmark-text me-1"></i>Reports</button></li>
-    </ul>
-
-    <div class="tab-content">
-        <!-- Upload -->
-        <div class="tab-pane fade show active" id="upload">
-            <div class="glass-card p-4">
-                <h5><i class="bi bi-cloud-upload text-primary"></i> Upload Invoices (CSV)</h5>
-                <p class="text-muted small">The database will be cleared before upload to avoid duplicates.</p>
-                <div class="upload-area my-3" id="dropZone">
-                    <i class="bi bi-file-earmark-arrow-up display-4 text-muted"></i>
-                    <p class="mt-2">Drag & drop your CSV file here, or click to browse</p>
-                    <input type="file" id="fileInput" accept=".csv" style="display:none;" />
-                    <button class="btn btn-outline-gradient mt-2" onclick="document.getElementById('fileInput').click()">Choose File</button>
+        <!-- ═══ STATS ROW — colorful cards ═══ -->
+        <div class="row g-3 mb-4" id="statsRow">
+            <div class="col-md-3 col-6">
+                <div class="glass-card stat-card stat-card-purple p-3 text-center">
+                    <div class="stat-number stat-number-purple" id="statInvoices">0</div>
+                    <div class="stat-label"><i class="bi bi-file-earmark-text me-1"></i>Total Invoices</div>
                 </div>
-                <div id="uploadResult" class="mt-3"></div>
-                <button id="uploadBtn" class="btn btn-gradient mt-3" disabled>Upload (clear & replace)</button>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="glass-card stat-card stat-card-green p-3 text-center">
+                    <div class="stat-number stat-number-green" id="statMatches">0</div>
+                    <div class="stat-label"><i class="bi bi-check2-circle me-1"></i>Total Matches</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="glass-card stat-card stat-card-orange p-3 text-center">
+                    <div class="stat-number stat-number-orange" id="statPending">0</div>
+                    <div class="stat-label"><i class="bi bi-clock me-1"></i>Pending Reviews</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="glass-card stat-card stat-card-pink p-3 text-center">
+                    <div class="stat-number stat-number-pink" id="statAccuracy">0%</div>
+                    <div class="stat-label"><i class="bi bi-graph-up-arrow me-1"></i>Accuracy (est.)</div>
+                </div>
             </div>
         </div>
 
-        <!-- Reconcile -->
-        <div class="tab-pane fade" id="reconcile">
-            <div class="glass-card p-4">
-                <h5><i class="bi bi-arrow-left-right text-primary"></i> Reconcile an Invoice</h5>
-                <div class="row g-3 mt-2 align-items-end">
-                    <div class="col-md-3">
-                        <label class="form-label">Invoice ID</label>
-                        <input type="number" id="invoiceId" class="form-control" value="1" min="1" />
+        <!-- ═══ TABS ═══ -->
+        <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#upload">
+                    <i class="bi bi-cloud-upload me-1"></i>Upload
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#uploadBank">
+                    <i class="bi bi-bank me-1"></i>Upload Bank
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#reconcile">
+                    <i class="bi bi-arrow-left-right me-1"></i>Reconcile
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#queue">
+                    <i class="bi bi-list-check me-1"></i>Queue
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#report">
+                    <i class="bi bi-file-earmark-text me-1"></i>Reports
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+
+            <!-- ─── UPLOAD (Invoices) ─── -->
+            <div class="tab-pane fade show active" id="upload">
+                <div class="glass-card p-4">
+                    <h5><i class="bi bi-cloud-upload text-primary"></i> Upload Invoices (CSV)</h5>
+                    <p class="text-muted small">The database will be cleared before upload to avoid duplicates.</p>
+                    <div class="upload-area my-3" id="dropZone">
+                        <i class="bi bi-file-earmark-arrow-up display-4 text-muted"></i>
+                        <p class="mt-2">Drag &amp; drop your CSV file here, or click to browse</p>
+                        <input type="file" id="fileInput" accept=".csv" style="display:none;" />
+                        <button class="btn btn-outline-gradient mt-2" onclick="document.getElementById('fileInput').click()">
+                            <i class="bi bi-folder2-open"></i> Choose File
+                        </button>
                     </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Mode</label>
-                        <select id="reconcileMode" class="form-select">
-                            <option value="true">Advanced (LLM)</option>
-                            <option value="false">Baseline</option>
-                        </select>
+                    <div id="uploadResult" class="mt-3"></div>
+                    <button id="uploadBtn" class="btn btn-gradient mt-3" disabled>
+                        <i class="bi bi-upload"></i> Upload (clear &amp; replace)
+                    </button>
+                </div>
+            </div>
+
+            <!-- ─── UPLOAD BANK (Transactions) ─── -->
+            <div class="tab-pane fade" id="uploadBank">
+                <div class="glass-card p-4">
+                    <h5><i class="bi bi-bank text-primary"></i> Upload Bank Transactions (CSV)</h5>
+                    <p class="text-muted small">The database will be cleared before upload to avoid duplicates.</p>
+                    <div class="upload-area my-3" id="dropZoneBank">
+                        <i class="bi bi-file-earmark-arrow-up display-4 text-muted"></i>
+                        <p class="mt-2">Drag &amp; drop your transaction CSV file here, or click to browse</p>
+                        <input type="file" id="fileInputBank" accept=".csv" style="display:none;" />
+                        <button class="btn btn-outline-gradient mt-2" onclick="document.getElementById('fileInputBank').click()">
+                            <i class="bi bi-folder2-open"></i> Choose File
+                        </button>
                     </div>
-                    <div class="col-md-3">
-                        <button id="reconcileBtn" class="btn btn-gradient w-100">Reconcile</button>
-                    </div>
+                    <div id="uploadBankResult" class="mt-3"></div>
+                    <button id="uploadBankBtn" class="btn btn-gradient mt-3" disabled>
+                        <i class="bi bi-upload"></i> Upload (clear &amp; replace)
+                    </button>
                 </div>
-                <!-- New row: Create Pending Match button -->
-                <div class="row g-3 mt-3">
-                    <div class="col-md-3">
-                        <button id="createPendingBtn" class="btn btn-warning"><i class="bi bi-plus-circle"></i> Create Pending Match (demo)</button>
-                    </div>
-                </div>
-                <div id="reconcileResult" class="mt-4"></div>
             </div>
-        </div>
 
-        <!-- Review Queue -->
-        <div class="tab-pane fade" id="queue">
-            <div class="glass-card p-4">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h5><i class="bi bi-list-check text-primary"></i> Pending Reviews</h5>
-                    <button id="refreshQueueBtn" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
-                </div>
-                <div id="queueContent" class="mt-3"><p class="text-muted">Loading...</p></div>
-            </div>
-        </div>
-
-        <!-- Reports -->
-        <div class="tab-pane fade" id="report">
-            <div class="glass-card p-4">
-                <h5><i class="bi bi-file-earmark-text text-primary"></i> Download Reconciliation Report</h5>
-                <p class="text-muted">Export all match decisions as CSV.</p>
-                <button id="downloadReportBtn" class="btn btn-gradient"><i class="bi bi-download"></i> Download CSV</button>
-                <div id="reportResult" class="mt-3"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Activity Log -->
-    <div class="glass-card p-3 mt-4">
-        <h6 class="mb-2"><i class="bi bi-clock-history"></i> Recent Activity</h6>
-        <div class="activity-log" id="activityLog">
-            <div class="list-group list-group-flush" id="activityList">
-                <div class="list-group-item text-muted">No activity yet.</div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    const API_BASE = 'http://127.0.0.1:8000';
-    let selectedFile = null;
-    let activityLog = [];
-
-    function showAlert(container, message, type = 'success') {
-        container.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
-    }
-    function clearAlerts(container) { container.innerHTML = ''; }
-    function addActivity(message, type = 'info') {
-        const now = new Date().toLocaleTimeString();
-        activityLog.unshift({ time: now, message, type });
-        if (activityLog.length > 20) activityLog.pop();
-        renderActivity();
-    }
-    function renderActivity() {
-        const list = document.getElementById('activityList');
-        if (!activityLog.length) {
-            list.innerHTML = '<div class="list-group-item text-muted">No activity yet.</div>';
-            return;
-        }
-        let html = '';
-        activityLog.forEach(item => {
-            const badge = item.type === 'success' ? 'success' : item.type === 'error' ? 'danger' : 'info';
-            html += `<div class="list-group-item"><span class="badge bg-${badge} me-2">${item.time}</span> ${item.message}</div>`;
-        });
-        list.innerHTML = html;
-    }
-
-    async function apiFetch(url, options = {}) {
-        try {
-            const res = await fetch(url, options);
-            if (!res.ok) {
-                const err = await res.json().catch(() => ({ detail: `HTTP ${res.status}` }));
-                throw new Error(err.detail || `HTTP ${res.status}`);
-            }
-            return await res.json();
-        } catch (e) {
-            if (e.message.includes('Failed to fetch')) {
-                throw new Error('Cannot connect to API. Make sure the server is running on port 8000.');
-            }
-            throw e;
-        }
-    }
-
-    async function checkHealth() {
-        const el = document.getElementById('healthStatus');
-        try {
-            await apiFetch(`${API_BASE}/health`);
-            el.className = 'badge bg-success';
-            el.innerHTML = '✅ Online';
-            return true;
-        } catch (e) {
-            el.className = 'badge bg-danger';
-            el.innerHTML = '❌ Offline';
-            addActivity('API is unreachable. Check server.', 'error');
-            return false;
-        }
-    }
-
-    async function updateStats() {
-        try {
-            const stats = await apiFetch(`${API_BASE}/stats`);
-            document.getElementById('statInvoices').textContent = stats.total_invoices || 0;
-            document.getElementById('statMatches').textContent = stats.total_matches || 0;
-            document.getElementById('statPending').textContent = stats.pending || 0;
-            if (stats.accuracy !== null) {
-                document.getElementById('statAccuracy').textContent = (stats.accuracy * 100).toFixed(1) + '%';
-            } else {
-                document.getElementById('statAccuracy').textContent = '—';
-            }
-        } catch (e) {
-            console.warn('Stats update failed:', e);
-        }
-    }
-
-    document.getElementById('resetBtn').addEventListener('click', async () => {
-        if (!confirm('Delete all invoices, matches, and transactions? This cannot be undone.')) return;
-        const resultEl = document.getElementById('uploadResult');
-        try {
-            const data = await apiFetch(`${API_BASE}/reset`, { method: 'DELETE' });
-            showAlert(resultEl, data.message, 'success');
-            addActivity('Database reset successfully.', 'success');
-            await refreshAll();
-        } catch (e) {
-            showAlert(resultEl, `❌ ${e.message}`, 'danger');
-            addActivity(`Reset failed: ${e.message}`, 'error');
-        }
-    });
-
-    // Upload
-    document.getElementById('fileInput').addEventListener('change', function(e) {
-        selectedFile = this.files[0];
-        document.getElementById('uploadBtn').disabled = !selectedFile;
-        const resultEl = document.getElementById('uploadResult');
-        if (selectedFile) {
-            showAlert(resultEl, `<i class="bi bi-check-circle"></i> ${selectedFile.name}`, 'info');
-        } else {
-            clearAlerts(resultEl);
-        }
-    });
-
-    document.getElementById('uploadBtn').addEventListener('click', async function() {
-        if (!selectedFile) return;
-        const resultEl = document.getElementById('uploadResult');
-        const formData = new FormData();
-        formData.append('file', selectedFile);
-        try {
-            const data = await apiFetch(`${API_BASE}/upload/invoices?clear=true`, {
-                method: 'POST',
-                body: formData
-            });
-            showAlert(resultEl, `✅ ${data.message}`, 'success');
-            addActivity(`Uploaded ${data.message.split(' ')[1]} invoices.`, 'success');
-            await refreshAll();
-        } catch (e) {
-            showAlert(resultEl, `❌ ${e.message}`, 'danger');
-            addActivity(`Upload failed: ${e.message}`, 'error');
-        }
-    });
-
-    const dropZone = document.getElementById('dropZone');
-    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
-    dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
-    dropZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropZone.classList.remove('dragover');
-        const files = e.dataTransfer.files;
-        if (files.length) {
-            document.getElementById('fileInput').files = files;
-            selectedFile = files[0];
-            document.getElementById('uploadBtn').disabled = false;
-            const resultEl = document.getElementById('uploadResult');
-            showAlert(resultEl, `<i class="bi bi-check-circle"></i> ${selectedFile.name}`, 'info');
-        }
-    });
-
-    // Reconcile
-    document.getElementById('reconcileBtn').addEventListener('click', async function() {
-        const invoiceId = document.getElementById('invoiceId').value.trim();
-        const useAdvanced = document.getElementById('reconcileMode').value;
-        const resultEl = document.getElementById('reconcileResult');
-        clearAlerts(resultEl);
-        if (!invoiceId || parseInt(invoiceId) < 1) {
-            showAlert(resultEl, 'Please enter a valid Invoice ID (≥1).', 'warning');
-            return;
-        }
-        const url = `${API_BASE}/reconcile/${invoiceId}?use_advanced=${useAdvanced}`;
-        try {
-            const data = await apiFetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
-            resultEl.innerHTML = `
-                <div class="row g-3">
-                    <div class="col-md-3"><div class="glass-card p-3 text-center"><small>Invoice ID</small><div class="stat-number">${data.invoice_id}</div></div></div>
-                    <div class="col-md-3"><div class="glass-card p-3 text-center"><small>Match ID</small><div class="stat-number">${data.match_id}</div></div></div>
-                    <div class="col-md-3"><div class="glass-card p-3 text-center"><small>Decision</small><div><span class="badge ${data.decision === 'APPROVED' ? 'bg-success' : data.decision === 'REJECTED' ? 'bg-danger' : 'bg-warning'}">${data.decision}</span></div></div></div>
-                    <div class="col-md-3"><div class="glass-card p-3 text-center"><small>Confidence</small><div class="stat-number">${(data.confidence * 100).toFixed(0)}%</div></div></div>
-                    <div class="col-12"><div class="progress" style="height:8px;"><div class="progress-bar progress-bar-gradient" style="width:${data.confidence * 100}%;"></div></div></div>
-                </div>
-            `;
-            addActivity(`Reconciled invoice ${invoiceId} -> ${data.decision} (${(data.confidence*100).toFixed(0)}%)`, 'success');
-            await refreshAll();
-        } catch (e) {
-            showAlert(resultEl, `❌ ${e.message}`, 'danger');
-            addActivity(`Reconciliation failed: ${e.message}`, 'error');
-        }
-    });
-
-    // ---- New: Create Pending Match ----
-    document.getElementById('createPendingBtn').addEventListener('click', async function() {
-        const invoiceId = document.getElementById('invoiceId').value.trim();
-        if (!invoiceId || parseInt(invoiceId) < 1) {
-            alert('Enter a valid Invoice ID.');
-            return;
-        }
-        try {
-            const res = await fetch(`${API_BASE}/create-pending/${invoiceId}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
-            });
-            const data = await res.json();
-            if (res.ok) {
-                alert(`✅ ${data.message}`);
-                loadQueue();    // refresh the queue
-                updateStats();  // update stats
-            } else {
-                alert(`❌ ${data.detail || 'Failed'}`);
-            }
-        } catch (e) {
-            alert('Error: ' + e.message);
-        }
-    });
-
-    // Review Queue
-    async function loadQueue() {
-        const container = document.getElementById('queueContent');
-        container.innerHTML = '<p class="text-muted">Loading...</p>';
-        try {
-            const data = await apiFetch(`${API_BASE}/review/queue`);
-            if (data.pending_count === 0) {
-                container.innerHTML = '<p class="text-muted">No pending reviews. 🎉</p>';
-                return;
-            }
-            let html = `<div class="alert alert-info">📌 ${data.pending_count} match(es) pending review</div>`;
-            data.items.forEach(item => {
-                html += `
-                    <div class="glass-card p-3 mb-3">
-                        <div class="row align-items-center">
-                            <div class="col-md-4"><strong>Match ID:</strong> ${item.id} | <strong>Invoice:</strong> ${item.invoice_id} | <strong>Confidence:</strong> ${item.confidence_score.toFixed(2)}</div>
-                            <div class="col-md-3"><span class="badge bg-warning">${item.agent_decision}</span></div>
-                            <div class="col-md-5 text-end">
-                                <button class="btn btn-sm btn-success approve-btn" data-match="${item.id}">✅ Approve</button>
-                                <button class="btn btn-sm btn-danger reject-btn" data-match="${item.id}">❌ Reject</button>
-                            </div>
+            <!-- ─── RECONCILE ─── -->
+            <div class="tab-pane fade" id="reconcile">
+                <div class="glass-card p-4">
+                    <h5><i class="bi bi-arrow-left-right text-primary"></i> Reconcile an Invoice</h5>
+                    <div class="row g-3 mt-2 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Invoice ID</label>
+                            <input type="number" id="invoiceId" class="form-control" value="1" min="1" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Mode</label>
+                            <select id="reconcileMode" class="form-select">
+                                <option value="true">Advanced (LLM)</option>
+                                <option value="false">Baseline</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button id="reconcileBtn" class="btn btn-gradient w-100">
+                                <i class="bi bi-arrow-right-circle"></i> Reconcile
+                            </button>
                         </div>
                     </div>
-                `;
-            });
-            container.innerHTML = html;
-            document.querySelectorAll('.approve-btn').forEach(btn => btn.addEventListener('click', handleReview('APPROVED')));
-            document.querySelectorAll('.reject-btn').forEach(btn => btn.addEventListener('click', handleReview('REJECTED')));
-            document.getElementById('statPending').textContent = data.pending_count;
-        } catch (e) {
-            container.innerHTML = `<div class="alert alert-danger">❌ ${e.message}</div>`;
+                    <div class="row g-3 mt-3">
+                        <div class="col-md-3">
+                            <button id="createPendingBtn" class="btn btn-gradient-orange">
+                                <i class="bi bi-plus-circle"></i> Create Pending Match (demo)
+                            </button>
+                        </div>
+                    </div>
+                    <div id="reconcileResult" class="mt-4"></div>
+                </div>
+            </div>
+
+            <!-- ─── QUEUE ─── -->
+            <div class="tab-pane fade" id="queue">
+                <div class="glass-card p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5><i class="bi bi-list-check text-primary"></i> Pending Reviews</h5>
+                        <button id="refreshQueueBtn" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-arrow-clockwise"></i> Refresh
+                        </button>
+                    </div>
+                    <div id="queueContent" class="mt-3"><p class="text-muted">Loading…</p></div>
+                </div>
+            </div>
+
+            <!-- ─── REPORTS ─── -->
+            <div class="tab-pane fade" id="report">
+                <div class="glass-card p-4">
+                    <h5><i class="bi bi-file-earmark-text text-primary"></i> Download Reconciliation Report</h5>
+                    <p class="text-muted">Export all match decisions as CSV.</p>
+                    <button id="downloadReportBtn" class="btn btn-gradient-green">
+                        <i class="bi bi-download"></i> Download CSV
+                    </button>
+                    <div id="reportResult" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ ACTIVITY LOG ═══ -->
+        <div class="glass-card p-3 mt-4">
+            <h6 class="mb-2"><i class="bi bi-clock-history text-primary"></i> Recent Activity</h6>
+            <div class="activity-log" id="activityLog">
+                <div class="list-group list-group-flush" id="activityList">
+                    <div class="list-group-item text-muted">No activity yet.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ SCRIPTS ═══ -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
+    </script>
+    <script>
+        const API_BASE = 'http://127.0.0.1:8000';
+        let selectedFile = null;
+        let selectedBankFile = null;
+        let activityLog = [];
+        let totalInvoices = 0;  // will be updated from stats
+
+        // ── helpers ──
+        function showAlert(container, message, type = 'success') {
+            container.innerHTML =
+                `<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
         }
-    }
 
-    function handleReview(decision) {
-        return async function(e) {
-            const matchId = e.target.dataset.match;
-            const payload = { decision, notes: `Reviewed via dashboard: ${decision}` };
-            try {
-                const data = await apiFetch(`${API_BASE}/review/${matchId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                addActivity(`Match ${matchId} ${decision} successfully.`, 'success');
-                await loadQueue();
-                await updateStats();
-            } catch (err) {
-                alert('Failed to update review: ' + err.message);
-                addActivity(`Review ${matchId} failed: ${err.message}`, 'error');
-            }
-        };
-    }
+        function clearAlerts(container) { container.innerHTML = ''; }
 
-    document.getElementById('refreshQueueBtn').addEventListener('click', loadQueue);
+        function addActivity(message, type = 'info') {
+            const now = new Date().toLocaleTimeString();
+            activityLog.unshift({ time: now, message, type });
+            if (activityLog.length > 20) activityLog.pop();
+            renderActivity();
+        }
 
-    // Download Report
-    document.getElementById('downloadReportBtn').addEventListener('click', async function() {
-        const resultEl = document.getElementById('reportResult');
-        clearAlerts(resultEl);
-        try {
-            const data = await apiFetch(`${API_BASE}/matches`);
-            if (data.total === 0) {
-                showAlert(resultEl, 'No matches found to export.', 'warning');
+        function renderActivity() {
+            const list = document.getElementById('activityList');
+            if (!activityLog.length) {
+                list.innerHTML = '<div class="list-group-item text-muted">No activity yet.</div>';
                 return;
             }
-            let csv = 'match_id,invoice_id,confidence,agent_decision,human_decision,human_notes,created_at\n';
-            data.items.forEach(item => {
-                csv += `${item.id},${item.invoice_id},${item.confidence_score},${item.agent_decision},${item.human_decision || ''},${item.human_notes || ''},${item.created_at}\n`;
+            let html = '';
+            activityLog.forEach(item => {
+                const cls = item.type === 'success' ? 'success' : item.type === 'error' ? 'error' : 'info';
+                const icon = item.type === 'success' ? '✅' : item.type === 'error' ? '❌' : 'ℹ️';
+                html += `<div class="list-group-item ${cls}"><span class="badge bg-secondary me-2">${item.time}</span> ${icon} ${item.message}</div>`;
             });
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `reconciliation_report_${new Date().toISOString().slice(0,10)}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            showAlert(resultEl, `✅ Report downloaded (${data.total} matches).`, 'success');
-            addActivity(`Downloaded report with ${data.total} matches.`, 'success');
-        } catch (e) {
-            showAlert(resultEl, `❌ ${e.message}`, 'danger');
-            addActivity(`Report download failed: ${e.message}`, 'error');
+            list.innerHTML = html;
         }
-    });
 
-    async function refreshAll() {
-        await checkHealth();
-        await loadQueue();
-        await updateStats();
-    }
+        async function apiFetch(url, options = {}) {
+            try {
+                const res = await fetch(url, options);
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({ detail: `HTTP ${res.status}` }));
+                    throw new Error(err.detail || `HTTP ${res.status}`);
+                }
+                return await res.json();
+            } catch (e) {
+                if (e.message.includes('Failed to fetch')) {
+                    throw new Error('Cannot connect to API. Make sure the server is running on port 8000.');
+                }
+                throw e;
+            }
+        }
 
-    document.getElementById('refreshAllBtn').addEventListener('click', refreshAll);
+        // ── health ──
+        async function checkHealth() {
+            const el = document.getElementById('healthStatus');
+            try {
+                await apiFetch(`${API_BASE}/health`);
+                el.className = 'badge bg-success';
+                el.innerHTML = '✅ Online';
+                return true;
+            } catch (e) {
+                el.className = 'badge bg-danger';
+                el.innerHTML = '❌ Offline';
+                addActivity('API is unreachable. Check server.', 'error');
+                return false;
+            }
+        }
 
-    setInterval(() => {
-        loadQueue();
-        updateStats();
-    }, 30000);
+        // ── stats ──
+        async function updateStats() {
+            try {
+                const stats = await apiFetch(`${API_BASE}/stats`);
+                document.getElementById('statInvoices').textContent = stats.total_invoices || 0;
+                document.getElementById('statMatches').textContent = stats.total_matches || 0;
+                document.getElementById('statPending').textContent = stats.pending || 0;
+                if (stats.accuracy !== null) {
+                    document.getElementById('statAccuracy').textContent = (stats.accuracy * 100).toFixed(1) + '%';
+                } else {
+                    document.getElementById('statAccuracy').textContent = '—';
+                }
+                // store total invoices for auto-increment logic
+                totalInvoices = stats.total_invoices || 0;
+            } catch (e) {
+                console.warn('Stats update failed:', e);
+            }
+        }
 
-    (async function init() {
-        await refreshAll();
-        addActivity('Dashboard initialized.', 'info');
-    })();
+        // ── reset ──
+        document.getElementById('resetBtn').addEventListener('click', async () => {
+            if (!confirm('Delete all invoices, matches, and transactions? This cannot be undone.')) return;
+            const resultEl = document.getElementById('uploadResult');
+            try {
+                const data = await apiFetch(`${API_BASE}/reset`, { method: 'DELETE' });
+                showAlert(resultEl, data.message, 'success');
+                addActivity('Database reset successfully.', 'success');
+                await refreshAll();
+            } catch (e) {
+                showAlert(resultEl, `❌ ${e.message}`, 'danger');
+                addActivity(`Reset failed: ${e.message}`, 'error');
+            }
+        });
 
-    document.querySelector('.upload-area .btn-outline-gradient')?.addEventListener('click', (e) => {
-        e.stopPropagation();
-        document.getElementById('fileInput').click();
-    });
-</script>
+        // ── upload invoices ──
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            selectedFile = this.files[0];
+            document.getElementById('uploadBtn').disabled = !selectedFile;
+            const resultEl = document.getElementById('uploadResult');
+            if (selectedFile) {
+                showAlert(resultEl, `<i class="bi bi-check-circle"></i> ${selectedFile.name}`, 'info');
+            } else {
+                clearAlerts(resultEl);
+            }
+        });
+
+        document.getElementById('uploadBtn').addEventListener('click', async function() {
+            if (!selectedFile) return;
+            const resultEl = document.getElementById('uploadResult');
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            try {
+                const data = await apiFetch(`${API_BASE}/upload/invoices?clear=true`, {
+                    method: 'POST',
+                    body: formData
+                });
+                showAlert(resultEl, `✅ ${data.message}`, 'success');
+                addActivity(`Uploaded ${data.message.split(' ')[1]} invoices.`, 'success');
+                await refreshAll();
+                // After upload, set invoice ID to 1 (or first invoice)
+                document.getElementById('invoiceId').value = 1;
+            } catch (e) {
+                showAlert(resultEl, `❌ ${e.message}`, 'danger');
+                addActivity(`Upload failed: ${e.message}`, 'error');
+            }
+        });
+
+        const dropZone = document.getElementById('dropZone');
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault();
+            dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length) {
+                document.getElementById('fileInput').files = files;
+                selectedFile = files[0];
+                document.getElementById('uploadBtn').disabled = false;
+                const resultEl = document.getElementById('uploadResult');
+                showAlert(resultEl, `<i class="bi bi-check-circle"></i> ${selectedFile.name}`, 'info');
+            }
+        });
+
+        // ── UPLOAD BANK TRANSACTIONS ──
+        document.getElementById('fileInputBank').addEventListener('change', function(e) {
+            selectedBankFile = this.files[0];
+            document.getElementById('uploadBankBtn').disabled = !selectedBankFile;
+            const resultEl = document.getElementById('uploadBankResult');
+            if (selectedBankFile) {
+                showAlert(resultEl, `<i class="bi bi-check-circle"></i> ${selectedBankFile.name}`, 'info');
+            } else {
+                clearAlerts(resultEl);
+            }
+        });
+
+        document.getElementById('uploadBankBtn').addEventListener('click', async function() {
+            if (!selectedBankFile) return;
+            const resultEl = document.getElementById('uploadBankResult');
+            const formData = new FormData();
+            formData.append('file', selectedBankFile);
+            try {
+                const data = await apiFetch(`${API_BASE}/upload/transactions?clear=true`, {
+                    method: 'POST',
+                    body: formData
+                });
+                showAlert(resultEl, `✅ ${data.message}`, 'success');
+                addActivity(`Uploaded bank transactions: ${data.message}`, 'success');
+                await refreshAll();
+            } catch (e) {
+                showAlert(resultEl, `❌ ${e.message}`, 'danger');
+                addActivity(`Bank upload failed: ${e.message}`, 'error');
+            }
+        });
+
+        const dropZoneBank = document.getElementById('dropZoneBank');
+        dropZoneBank.addEventListener('dragover', (e) => { e.preventDefault();
+            dropZoneBank.classList.add('dragover'); });
+        dropZoneBank.addEventListener('dragleave', () => { dropZoneBank.classList.remove('dragover'); });
+        dropZoneBank.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZoneBank.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length) {
+                document.getElementById('fileInputBank').files = files;
+                selectedBankFile = files[0];
+                document.getElementById('uploadBankBtn').disabled = false;
+                const resultEl = document.getElementById('uploadBankResult');
+                showAlert(resultEl, `<i class="bi bi-check-circle"></i> ${selectedBankFile.name}`, 'info');
+            }
+        });
+
+        // ── reconcile ──
+        document.getElementById('reconcileBtn').addEventListener('click', async function() {
+            const invoiceIdInput = document.getElementById('invoiceId');
+            const invoiceId = invoiceIdInput.value.trim();
+            const useAdvanced = document.getElementById('reconcileMode').value;
+            const resultEl = document.getElementById('reconcileResult');
+            clearAlerts(resultEl);
+            if (!invoiceId || parseInt(invoiceId) < 1) {
+                showAlert(resultEl, 'Please enter a valid Invoice ID (≥1).', 'warning');
+                return;
+            }
+            const url = `${API_BASE}/reconcile/${invoiceId}?use_advanced=${useAdvanced}`;
+            try {
+                const data = await apiFetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+                const decisionBadge = data.decision === 'APPROVED' ? 'bg-success' :
+                    data.decision === 'REJECTED' ? 'bg-danger' : 'bg-warning';
+                resultEl.innerHTML = `
+                    <div class="row g-3">
+                        <div class="col-md-3"><div class="glass-card p-3 text-center"><small>Invoice ID</small><div class="stat-number stat-number-purple">${data.invoice_id}</div></div></div>
+                        <div class="col-md-3"><div class="glass-card p-3 text-center"><small>Match ID</small><div class="stat-number stat-number-green">${data.match_id}</div></div></div>
+                        <div class="col-md-3"><div class="glass-card p-3 text-center"><small>Decision</small><div><span class="badge ${decisionBadge} fs-6">${data.decision}</span></div></div></div>
+                        <div class="col-md-3"><div class="glass-card p-3 text-center"><small>Confidence</small><div class="stat-number stat-number-pink">${(data.confidence * 100).toFixed(0)}%</div></div></div>
+                        <div class="col-12"><div class="progress" style="height:8px;"><div class="progress-bar progress-bar-gradient" style="width:${data.confidence * 100}%;"></div></div></div>
+                    </div>
+                `;
+                addActivity(`Reconciled invoice ${invoiceId} → ${data.decision} (${(data.confidence*100).toFixed(0)}%)`,
+                    'success');
+                await refreshAll();
+
+                // ---- AUTO-INCREMENT INVOICE ID ----
+                let currentId = parseInt(invoiceId);
+                let nextId = currentId + 1;
+                // If we have totalInvoices > 0 and nextId > totalInvoices, wrap around to 1
+                if (totalInvoices > 0 && nextId > totalInvoices) {
+                    nextId = 1;
+                }
+                invoiceIdInput.value = nextId;
+
+            } catch (e) {
+                showAlert(resultEl, `❌ ${e.message}`, 'danger');
+                addActivity(`Reconciliation failed: ${e.message}`, 'error');
+            }
+        });
+
+        // ── create pending match ──
+        document.getElementById('createPendingBtn').addEventListener('click', async function() {
+            const invoiceId = document.getElementById('invoiceId').value.trim();
+            if (!invoiceId || parseInt(invoiceId) < 1) {
+                alert('Enter a valid Invoice ID.');
+                return;
+            }
+            try {
+                const res = await fetch(`${API_BASE}/create-pending/${invoiceId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    alert(`✅ ${data.message}`);
+                    loadQueue();
+                    updateStats();
+                } else {
+                    alert(`❌ ${data.detail || 'Failed'}`);
+                }
+            } catch (e) {
+                alert('Error: ' + e.message);
+            }
+        });
+
+        // ── queue ──
+        async function loadQueue() {
+            const container = document.getElementById('queueContent');
+            container.innerHTML = '<p class="text-muted">Loading…</p>';
+            try {
+                const data = await apiFetch(`${API_BASE}/review/queue`);
+                if (data.pending_count === 0) {
+                    container.innerHTML = '<p class="text-muted">No pending reviews. 🎉</p>';
+                    return;
+                }
+                let html =
+                    `<div class="alert alert-warning">📌 ${data.pending_count} match(es) pending review</div>`;
+                data.items.forEach(item => {
+                    const badgeCls = item.agent_decision === 'APPROVED' ? 'badge-decision-approved' :
+                        item.agent_decision === 'REJECTED' ? 'badge-decision-rejected' :
+                        'badge-decision-pending';
+                    html += `
+                        <div class="glass-card p-3 mb-3">
+                            <div class="row align-items-center">
+                                <div class="col-md-4"><strong>Match ID:</strong> ${item.id} | <strong>Invoice:</strong> ${item.invoice_id} | <strong>Confidence:</strong> ${item.confidence_score.toFixed(2)}</div>
+                                <div class="col-md-3"><span class="badge ${badgeCls}">${item.agent_decision}</span></div>
+                                <div class="col-md-5 text-end">
+                                    <button class="btn btn-sm btn-gradient-green approve-btn" data-match="${item.id}">✅ Approve</button>
+                                    <button class="btn btn-sm btn-danger reject-btn" data-match="${item.id}">❌ Reject</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+                document.querySelectorAll('.approve-btn').forEach(btn =>
+                    btn.addEventListener('click', handleReview('APPROVED'))
+                );
+                document.querySelectorAll('.reject-btn').forEach(btn =>
+                    btn.addEventListener('click', handleReview('REJECTED'))
+                );
+                document.getElementById('statPending').textContent = data.pending_count;
+            } catch (e) {
+                container.innerHTML = `<div class="alert alert-danger">❌ ${e.message}</div>`;
+            }
+        }
+
+        function handleReview(decision) {
+            return async function(e) {
+                const matchId = e.target.dataset.match;
+                const payload = { decision, notes: `Reviewed via dashboard: ${decision}` };
+                try {
+                    const data = await apiFetch(`${API_BASE}/review/${matchId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    addActivity(`Match ${matchId} ${decision} successfully.`, 'success');
+                    await loadQueue();
+                    await updateStats();
+                } catch (err) {
+                    alert('Failed to update review: ' + err.message);
+                    addActivity(`Review ${matchId} failed: ${err.message}`, 'error');
+                }
+            };
+        }
+
+        document.getElementById('refreshQueueBtn').addEventListener('click', loadQueue);
+
+        // ── download report ──
+        document.getElementById('downloadReportBtn').addEventListener('click', async function() {
+            const resultEl = document.getElementById('reportResult');
+            clearAlerts(resultEl);
+            try {
+                const data = await apiFetch(`${API_BASE}/matches`);
+                if (data.total === 0) {
+                    showAlert(resultEl, 'No matches found to export.', 'warning');
+                    return;
+                }
+                let csv = 'match_id,invoice_id,confidence,agent_decision,human_decision,human_notes,created_at\n';
+                data.items.forEach(item => {
+                    csv +=
+                        `${item.id},${item.invoice_id},${item.confidence_score},${item.agent_decision},${item.human_decision || ''},${item.human_notes || ''},${item.created_at}\n`;
+                });
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `reconciliation_report_${new Date().toISOString().slice(0,10)}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showAlert(resultEl, `✅ Report downloaded (${data.total} matches).`, 'success');
+                addActivity(`Downloaded report with ${data.total} matches.`, 'success');
+            } catch (e) {
+                showAlert(resultEl, `❌ ${e.message}`, 'danger');
+                addActivity(`Report download failed: ${e.message}`, 'error');
+            }
+        });
+
+        // ── refresh all ──
+        async function refreshAll() {
+            await checkHealth();
+            await loadQueue();
+            await updateStats();
+        }
+
+        document.getElementById('refreshAllBtn').addEventListener('click', refreshAll);
+
+        // ── auto-refresh ──
+        setInterval(() => {
+            loadQueue();
+            updateStats();
+        }, 30000);
+
+        // ── init ──
+        (async function init() {
+            await refreshAll();
+            addActivity('Dashboard initialized.', 'info');
+        })();
+
+        // Click on "Choose File" button should open file input (for both zones)
+        document.querySelector('#upload .upload-area .btn-outline-gradient')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('fileInput').click();
+        });
+        document.querySelector('#uploadBank .upload-area .btn-outline-gradient')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('fileInputBank').click();
+        });
+    </script>
 </body>
 </html>

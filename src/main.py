@@ -3,6 +3,7 @@ FastAPI application for invoice-to-bank reconciliation using agentic workflows.
 
 This module provides REST endpoints for:
 - Uploading invoice CSV files (with optional database reset).
+- Uploading bank transaction CSV files.
 - Performing reconciliation (baseline rule-based or advanced LLM-based).
 - Managing a human review queue for ambiguous matches.
 - Resetting the database programmatically.
@@ -85,7 +86,7 @@ def get_db() -> Session:
 
 
 # ----------------------------------------------------------------------
-# Helper: Parse CSV content into Invoice objects
+# Helper: Parse invoice CSV
 # ----------------------------------------------------------------------
 def _parse_invoice_csv(content: bytes) -> List[dict]:
     """
@@ -130,6 +131,54 @@ def _parse_invoice_csv(content: bytes) -> List[dict]:
             raise ValueError(f"Row {row_num}: {str(e)}") from e
 
     return invoices
+
+
+# ----------------------------------------------------------------------
+# Helper: Parse transaction CSV
+# ----------------------------------------------------------------------
+def _parse_transaction_csv(content: bytes) -> List[dict]:
+    """
+    Parse CSV content into a list of transaction dictionaries.
+
+    Args:
+        content: Raw bytes of the CSV file.
+
+    Returns:
+        List[dict]: Each dict contains keys: vendor, amount, date, (optional) currency, description.
+
+    Raises:
+        ValueError: If required columns are missing or data is malformed.
+    """
+    try:
+        text = content.decode("utf-8")
+    except UnicodeDecodeError as e:
+        raise ValueError("File must be UTF-8 encoded.") from e
+
+    try:
+        reader = csv.DictReader(io.StringIO(text))
+    except Exception as e:
+        raise ValueError(f"Invalid CSV format: {str(e)}") from e
+
+    required_columns = {"vendor", "amount", "date"}
+    if not required_columns.issubset(reader.fieldnames or set()):
+        missing = required_columns - set(reader.fieldnames or set())
+        raise ValueError(f"Missing required columns: {missing}")
+
+    transactions = []
+    for row_num, row in enumerate(reader, start=2):  # row 1 is header
+        try:
+            trans = {
+                "vendor": row["vendor"].strip(),
+                "amount": float(row["amount"]),
+                "date": datetime.strptime(row["date"], "%Y-%m-%d"),
+                "currency": row.get("currency", "USD").strip(),
+                "description": row.get("description", f"Payment from {row['vendor']}").strip(),
+            }
+            transactions.append(trans)
+        except (KeyError, ValueError) as e:
+            raise ValueError(f"Row {row_num}: {str(e)}") from e
+
+    return transactions
 
 
 # ----------------------------------------------------------------------
@@ -230,6 +279,81 @@ async def upload_invoices(
         db.rollback()
         logger.error(f"Database error during upload: {e}")
         raise HTTPException(500, "Internal server error while saving invoices.")
+
+
+@app.post("/upload/transactions", summary="Upload bank transactions from CSV")
+async def upload_transactions(
+    file: UploadFile = File(
+        ...,
+        description="CSV file with columns: vendor, amount, date, (optional) currency, description"
+    ),
+    clear: bool = Query(
+        False,
+        description="If true, delete all existing transactions (and their associated matches) before uploading."
+    ),
+    db: Session = Depends(get_db),
+):
+    """
+    Upload a CSV file containing bank transaction data.
+
+    Expected CSV columns:
+        - vendor (str)
+        - amount (float)
+        - date (YYYY-MM-DD)
+        - currency (str, defaults to USD)
+        - description (str, defaults to "Payment from {vendor}")
+
+    If `clear=True`, all existing transactions are deleted, and any matches referencing them
+    are also removed to maintain foreign-key integrity.
+
+    Returns:
+        dict: {"message": f"Uploaded {count} transactions"}
+    """
+    # Validate file type
+    if not file.filename or not file.filename.endswith(".csv"):
+        raise HTTPException(400, "Only CSV files are allowed.")
+
+    # Read and parse file
+    content = await file.read()
+    try:
+        trans_data = _parse_transaction_csv(content)
+    except ValueError as e:
+        logger.warning(f"CSV parsing failed: {e}")
+        raise HTTPException(400, f"CSV parsing error: {str(e)}")
+
+    # Optional: clear existing transactions
+    if clear:
+        try:
+            # Delete matches that reference transactions to avoid foreign key violations
+            db.query(Match).filter(Match.transaction_id.isnot(None)).delete(synchronize_session=False)
+            db.query(Transaction).delete()
+            db.commit()
+            logger.info("Transactions (and their matches) cleared before upload.")
+        except Exception as e:
+            db.rollback()
+            raise HTTPException(500, f"Failed to clear transactions: {str(e)}")
+
+    # Insert into database
+    try:
+        count = 0
+        for data in trans_data:
+            txn = Transaction(
+                vendor=data["vendor"],
+                amount=data["amount"],
+                date=data["date"],
+                currency=data["currency"],
+                description=data["description"],
+            )
+            db.add(txn)
+            count += 1
+        db.commit()
+        logger.info(f"Uploaded {count} transactions.")
+        return {"message": f"Uploaded {count} transactions"}
+
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Database error during transaction upload: {e}")
+        raise HTTPException(500, "Internal server error while saving transactions.")
 
 
 @app.post("/reconcile/{invoice_id}", response_model=ReconcileResponse)
@@ -425,7 +549,6 @@ def get_stats(db: Session = Depends(get_db)):
         "accuracy": accuracy,
         "total_reviewed": total_reviewed,
     }
-
 
 
 @app.post("/create-pending/{invoice_id}")

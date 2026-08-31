@@ -142,13 +142,15 @@ cd reconcile-agent
 
 # Install dependencies
 poetry install
-
+# Install pydantic-settings
+python -m poetry add pydantic-settings
 # Create .env file from example (copy and fill in your key)
 cp .env.example .env   # Add OPENAI_API_KEY and OPENAI_BASE_URL
 
 # Lock dependencies
 python -m poetry lock
-
+#Install dependencies
+python -m poetry install
 # (Optional) If you get database errors, delete the existing DB
 # Remove-Item .\test.db   # Windows
 # rm test.db            # Linux/macOS

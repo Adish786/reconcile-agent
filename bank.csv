@@ -1,0 +1,11 @@
+vendor,amount,date,currency,description
+Acme Corp,1500.50,2026-01-14,USD,Payment from Acme Corp
+Beta Inc,2300.00,2026-01-15,USD,Payment from Beta Inc
+Gamma LLC,875.25,2026-01-16,USD,Payment from Gamma LLC
+Delta Partners,3200.00,2026-01-17,USD,Payment from Delta Partners
+XYZ Corp,4300.75,2026-01-18,USD,Payment from XYZ Corp
+Alpha Ltd,1250.00,2026-01-19,USD,Payment from Alpha Ltd
+Omega Inc,3225.50,2026-01-20,USD,Payment from Omega Inc
+Psi Partners,890.30,2026-01-21,USD,Payment from Psi Partners
+Zeta Co,2100.00,2026-01-22,USD,Payment from Zeta Co
+Epsilon LLC,5600.00,2026-01-23,USD,Payment from Epsilon LLC
